@@ -1,23 +1,39 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Product;
+import edu.upc.dsa.models.Order;
+import edu.upc.dsa.models.User;
+
 
 import java.util.List;
 
-public interface TracksManager {
 
 
-    public Product addTrack(String id, String title, String singer);
-    public Product addTrack(String title, String singer);
-    public Product addTrack(Product t);
-    public Product getTrack(String id);
-    public Product getTrack2(String id) throws TrackNotFoundException;
+import java.util.List;
 
-    public List<Product> findAll();
-    public void deleteTrack(String id);
-    public Product updateTrack(Product t);
+public interface ProductManager {
+    public Order deliverOrder1(String name);
+    public void addProduct(String id, String name, double price);
 
-    public void clear();
-    public int size();
+    public List<models.Product> getProductsByPrice();
+
+    public void addOrder(Order order);
+
+    public int numOrders();
+
+
+    public Order deliverOrder();
+
+    models.Product getProduct(String c1);
+
+    User getUser(String number);
+    int numUsers();
+
+    void deleteProduct(String id);
+
+    List<models.Product> findAll();
+
+    models.Product updateProduct(models.Product product);
+    public void addUser(User user);
 }
+

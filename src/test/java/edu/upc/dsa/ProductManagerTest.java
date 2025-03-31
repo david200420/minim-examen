@@ -1,7 +1,9 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Product;
+
+import edu.upc.dsa.models.Order;
+import edu.upc.dsa.models.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,95 +11,78 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class TracksManagerTest {
-    TracksManager tm;
+
+import models.Product;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProductManagerTest {
+    ProductManager pm;
 
     @Before
     public void setUp() {
-        this.tm = TracksManagerImpl.getInstance();
-        this.tm.addTrack("T1", "La Barbacoa", "Georgie Dann");
-        this.tm.addTrack("T2", "Despacito", "Luis Fonsi");
-        this.tm.addTrack("T3", "Ent3r S4ndm4n", "Metallica");
+        pm = new ProductManagerImpl();
+        pm.addProduct("C1", "Coca-cola zero", 2);
+        pm.addProduct("C2", "Coca-cola", 2.5);
+        pm.addProduct("B1", "Lomo queso", 3);
+        pm.addProduct("B2", "bacon queso", 3.5);
     }
 
     @After
     public void tearDown() {
-        // És un Singleton
-        this.tm.clear();
+        this.pm = null;
     }
 
     @Test
-    public void addTrackTest() {
-        Assert.assertEquals(3, tm.size());
-
-        this.tm.addTrack("La Vereda De La Puerta De Atrás", "Extremoduro");
-
-        Assert.assertEquals(4, tm.size());
-
+    public void testProductByPrice() {
+        List<models.Product> products = pm.getProductsByPrice();
+        Assert.assertEquals(3.5, products.get(0).getPreu(),0);
+        Assert.assertEquals(3, products.get(1).getPreu(), 0);
+        Assert.assertEquals(2.5, products.get(2).getPreu(), 0);
+        Assert.assertEquals(2, products.get(3).getPreu(), 0);
     }
 
     @Test
-    public void getTrackTest() throws Exception {
-        Assert.assertEquals(3, tm.size());
-
-        Product t = this.tm.getTrack("T2");
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        t = this.tm.getTrack2("T2");
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        Assert.assertThrows(TrackNotFoundException.class, () ->
-                this.tm.getTrack2("XXXXXXX"));
-
+    public void testAddOrder() {
+        Assert.assertEquals(0, pm.numOrders());
+        Order o = new Order("381112838");
+        o.addLP(2, "C1"); //, "coca-cola");
+        o.addLP(1, "bocata de pernil");
+        o.addLP(1, "donut");
+        pm.addOrder(o);
+        System.out.println(o.getLP(0));
+        Assert.assertEquals(1, pm.numOrders());
     }
 
     @Test
-    public void getTracksTest() {
-        Assert.assertEquals(3, tm.size());
-        List<Product> products = tm.findAll();
-
-        Product t = products.get(0);
-        Assert.assertEquals("La Barbacoa", t.getTitle());
-        Assert.assertEquals("Georgie Dann", t.getSinger());
-
-        t = products.get(1);
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        t = products.get(2);
-        Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
-
-        Assert.assertEquals(3, tm.size());
-
+    public void testDeliverOrder() {
+        testAddOrder();
+        Assert.assertEquals(1, pm.numOrders());
+        Order o = pm.deliverOrder();
+        Assert.assertEquals(0, pm.numOrders());
+        Assert.assertEquals("381112838", o.getUser());
     }
 
     @Test
-    public void updateTrackTest() {
-        Assert.assertEquals(3, tm.size());
-        Product t = this.tm.getTrack("T3");
-        Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
-
-        t.setTitle("Enter Sandman");
-        this.tm.updateTrack(t);
-
-        t = this.tm.getTrack("T3");
-        Assert.assertEquals("Enter Sandman", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
+    public void testSales() {
+        testDeliverOrder();
+        models.Product p = pm.getProduct("C1");
+        Assert.assertEquals(2, (int)p.sales());
     }
 
-
     @Test
-    public void deleteTrackTest() {
-        Assert.assertEquals(3, tm.size());
-        this.tm.deleteTrack("T3");
-        Assert.assertEquals(2, tm.size());
-
-        Assert.assertThrows(TrackNotFoundException.class, () ->
-                this.tm.getTrack2("T3"));
-
+    public void testOrdersByUser() {
+        testSales();
+        User u = pm.getUser("381112838");
+        Order o = pm.deliverOrder1(u.getNom());
+        List<Order> l = new ArrayList<Order>();
+        l.add(o);
+        Assert.assertEquals(1, l.size());
     }
 }

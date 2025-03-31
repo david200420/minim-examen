@@ -1,108 +1,131 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Product;
+
 
 import java.util.LinkedList;
 import java.util.List;
+
+import edu.upc.dsa.models.Order;
+import edu.upc.dsa.models.User;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-public class TracksManagerImpl implements TracksManager {
-    private static TracksManager instance;
-    protected List<Product> products;
-    final static Logger logger = Logger.getLogger(TracksManagerImpl.class);
 
-    private TracksManagerImpl() {
-        this.products = new LinkedList<>();
-    }
+import models.Product;
 
-    public static TracksManager getInstance() {
-        if (instance==null) instance = new TracksManagerImpl();
+import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class ProductManagerImpl implements ProductManager {
+    private List<models.Product> productList;
+    private Queue<Order> orderQueue;
+    private HashMap<String, User> users;
+    private static final Logger logger = LogManager.getLogger(ProductManagerImpl.class);
+    private static ProductManagerImpl instance;
+
+    public static ProductManagerImpl getInstance() { //Se crea una instancia para poder tener una comun entre los diferentes clientes
+        if (instance == null) {
+            instance = new ProductManagerImpl();
+        }
         return instance;
     }
 
-    public int size() {
-        int ret = this.products.size();
-        logger.info("size " + ret);
-
-        return ret;
+    public ProductManagerImpl() {
+        productList = new ArrayList<>();
+        orderQueue = new LinkedList<>();
+        users = new HashMap<>();
     }
 
-    public Product addTrack(Product t) {
-        logger.info("new Product " + t);
+    @Override
+    public void addProduct(String id, String name, double price) {
+        logger.info("Adding product with id " + id + " and name " + name);
+        productList.add(new models.Product(id, name, price));
 
-        this.products.add (t);
-        logger.info("new Product added");
-        return t;
     }
 
-    public Product addTrack(String title, String singer){
-        return this.addTrack(null, title, singer);
+    @Override
+    public List<models.Product> getProductsByPrice() {
+        logger.info("Getting products by price");
+        productList.sort(Comparator.comparing(models.Product::getPreu).reversed());
+        return productList;
     }
 
-    public Product addTrack(String id, String title, String singer) {
-        return this.addTrack(new Product(id, title, singer));
+    @Override
+    public void addOrder(Order order) {
+        orderQueue.add(order);
+        users.put(order.getUser(),order.getUser1());
     }
 
-    public Product getTrack(String id) {
-        logger.info("getTrack("+id+")");
+    @Override
+    public int numOrders() {
+        return orderQueue.size();
+    }
 
-        for (Product t: this.products) {
-            if (t.getId().equals(id)) {
-                logger.info("getTrack("+id+"): "+t);
+    @Override
+    public Order deliverOrder() {
+        Order order = orderQueue.poll();
+        return order;
+    }
 
-                return t;
+    public Order deliverOrder1(String name) {
+        for (Order order : orderQueue) {
+            if (order.getUser().equals(name)) {
+                return order; // Devuelve la orden si el usuario coincide
             }
         }
+        return null; // Si no encuentra ninguna orden con ese usuario
+    }
 
-        logger.warn("not found " + id);
+    @Override
+    public models.Product getProduct(String c1) {
+        for (models.Product p : this.productList) {
+            if (p.getId().equals(c1)) {
+                return p;
+            }
+        }
         return null;
     }
 
-    public Product getTrack2(String id) throws TrackNotFoundException {
-        Product t = getTrack(id);
-        if (t == null) throw new TrackNotFoundException();
-        return t;
+    @Override
+    public User getUser(String number) {
+        return users.get(number);
+    }
+    @Override
+    public int numUsers() {
+        return users.size();
+    }
+
+    @Override
+    public void deleteProduct(String id) {
+        for (Product p : this.productList) {
+            if (p.getId().equals(id)) {
+                productList.remove(p);
+            }
+        }
+
     }
 
 
+    @Override
     public List<Product> findAll() {
-        return this.products;
+        return productList;
     }
 
     @Override
-    public void deleteTrack(String id) {
-
-        Product t = this.getTrack(id);
-        if (t==null) {
-            logger.warn("not found " + t);
+    public Product updateProduct(Product product) {
+        for (models.Product p : this.productList) {
+            if (p.getId().equals(product.getId())) {
+                return product;
+            }
         }
-        else logger.info(t+" deleted ");
-
-        this.products.remove(t);
-
+        return null;
     }
 
     @Override
-    public Product updateTrack(Product p) {
-        Product t = this.getTrack(p.getId());
-
-        if (t!=null) {
-            logger.info(p+" rebut!!!! ");
-
-            t.setSinger(p.getSinger());
-            t.setTitle(p.getTitle());
-
-            logger.info(t+" updated ");
-        }
-        else {
-            logger.warn("not found "+p);
-        }
-
-        return t;
-    }
-
-    public void clear() {
-        this.products.clear();
+    public void addUser(User user) {
+        users.put(user.getNom(),user);
     }
 }

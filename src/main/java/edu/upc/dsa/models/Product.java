@@ -1,56 +1,33 @@
-package edu.upc.dsa.models;
+package models;
 
-import edu.upc.dsa.util.RandomUtils;
+public class Product {
 
-public class Track {
+    private double preu;
+    private String nom;
+    private String id;
+    private int cantitat;
 
-    String id;
-    String title;
-    String singer;
-    static int lastId;
-
-    public Track() {
-        this.setId(RandomUtils.getId());
-    }
-    public Track(String title, String singer) {
-        this(null, title, singer);
+    public Product(int cantitat, String name) {
+        this.cantitat= cantitat;
+        this.nom = name;//y si lo son pues le pone un valor, asi ahorramos constructores.
     }
 
-    public Track(String id, String title, String singer) {
-        this();
-        if (id != null) this.setId(id);
-        this.setSinger(singer);
-        this.setTitle(title);
+    public Product(String id, String name, double price  ) {
+        this.id= id;
+        this.preu = price;
+        this.nom = name;//y si lo son pues le pone un valor, asi ahorramos constructores.
     }
-
-    public String getId() {
+    public String getNom() {
+        return this.nom;
+    }
+    public String getId () {
         return this.id;
     }
-
-    public void setId(String id) {
-        this.id=id;
+    public double getPreu() {
+        return preu;
     }
 
-
-    public String getTitle() {
-        return title;
+    public double sales() {
+        return this.preu;
     }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getSinger() {
-        return singer;
-    }
-
-    public void setSinger(String singer) {
-        this.singer = singer;
-    }
-
-    @Override
-    public String toString() {
-        return "Track [id="+id+", title=" + title + ", singer=" + singer +"]";
-    }
-
 }

@@ -1,4 +1,4 @@
-package models;
+package edu.upc.dsa.models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,9 @@ public class User {
     }
     public String getNom() {
         return this.nom;
+    }
+    public int getId() {
+        return this.id;
     }
     public void setNom(String nom) {
         this.nom = nom;
