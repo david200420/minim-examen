@@ -1,7 +1,7 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Track;
+import edu.upc.dsa.models.Product;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,11 +9,11 @@ import org.apache.log4j.Logger;
 
 public class TracksManagerImpl implements TracksManager {
     private static TracksManager instance;
-    protected List<Track> tracks;
+    protected List<Product> products;
     final static Logger logger = Logger.getLogger(TracksManagerImpl.class);
 
     private TracksManagerImpl() {
-        this.tracks = new LinkedList<>();
+        this.products = new LinkedList<>();
     }
 
     public static TracksManager getInstance() {
@@ -22,32 +22,32 @@ public class TracksManagerImpl implements TracksManager {
     }
 
     public int size() {
-        int ret = this.tracks.size();
+        int ret = this.products.size();
         logger.info("size " + ret);
 
         return ret;
     }
 
-    public Track addTrack(Track t) {
-        logger.info("new Track " + t);
+    public Product addTrack(Product t) {
+        logger.info("new Product " + t);
 
-        this.tracks.add (t);
-        logger.info("new Track added");
+        this.products.add (t);
+        logger.info("new Product added");
         return t;
     }
 
-    public Track addTrack(String title, String singer){
+    public Product addTrack(String title, String singer){
         return this.addTrack(null, title, singer);
     }
 
-    public Track addTrack(String id, String title, String singer) {
-        return this.addTrack(new Track(id, title, singer));
+    public Product addTrack(String id, String title, String singer) {
+        return this.addTrack(new Product(id, title, singer));
     }
 
-    public Track getTrack(String id) {
+    public Product getTrack(String id) {
         logger.info("getTrack("+id+")");
 
-        for (Track t: this.tracks) {
+        for (Product t: this.products) {
             if (t.getId().equals(id)) {
                 logger.info("getTrack("+id+"): "+t);
 
@@ -59,33 +59,33 @@ public class TracksManagerImpl implements TracksManager {
         return null;
     }
 
-    public Track getTrack2(String id) throws TrackNotFoundException {
-        Track t = getTrack(id);
+    public Product getTrack2(String id) throws TrackNotFoundException {
+        Product t = getTrack(id);
         if (t == null) throw new TrackNotFoundException();
         return t;
     }
 
 
-    public List<Track> findAll() {
-        return this.tracks;
+    public List<Product> findAll() {
+        return this.products;
     }
 
     @Override
     public void deleteTrack(String id) {
 
-        Track t = this.getTrack(id);
+        Product t = this.getTrack(id);
         if (t==null) {
             logger.warn("not found " + t);
         }
         else logger.info(t+" deleted ");
 
-        this.tracks.remove(t);
+        this.products.remove(t);
 
     }
 
     @Override
-    public Track updateTrack(Track p) {
-        Track t = this.getTrack(p.getId());
+    public Product updateTrack(Product p) {
+        Product t = this.getTrack(p.getId());
 
         if (t!=null) {
             logger.info(p+" rebut!!!! ");
@@ -103,6 +103,6 @@ public class TracksManagerImpl implements TracksManager {
     }
 
     public void clear() {
-        this.tracks.clear();
+        this.products.clear();
     }
 }
