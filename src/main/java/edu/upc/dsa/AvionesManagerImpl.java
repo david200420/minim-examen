@@ -1,130 +1,86 @@
 package edu.upc.dsa;
-
-
-import java.util.LinkedList;
 import java.util.List;
-
+import edu.upc.dsa.exceptions.AvionNotFoundException;
+import edu.upc.dsa.exceptions.VueloNotFoundException;
 import edu.upc.dsa.models.Avion;
 import edu.upc.dsa.models.Maleta;
-import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.Vuelo;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-
 import java.util.*;
-import java.util.Comparator;
 
-public class ProductManagerImpl implements ProductManager {
-    private List<Maleta> maletaList;
-    private Queue<Avion> avionQueue;
-    private HashMap<String, User> users;
-    private static final Logger logger = LogManager.getLogger(ProductManagerImpl.class);
-    private static ProductManagerImpl instance;
 
-    public static ProductManagerImpl getInstance() { //Se crea una instancia para poder tener una comun entre los diferentes clientes
+public class AvionesManagerImpl implements AvionesManager {
+    private Map<String, Avion> aviones;
+    private Map<String, Vuelo> vuelos;
+
+    private static final Logger logger = LogManager.getLogger(AvionesManagerImpl.class);
+    private static AvionesManagerImpl instance;
+
+    public static AvionesManagerImpl getInstance() { //Se crea una instancia para poder tener una comun entre los diferentes clientes
         if (instance == null) {
-            instance = new ProductManagerImpl();
+            instance = new AvionesManagerImpl();
         }
         return instance;
     }
 
-    public ProductManagerImpl() {
-        maletaList = new ArrayList<>();
-        avionQueue = new LinkedList<>();
-        users = new HashMap<>();
-    }
-
-    @Override
-    public void addAvion(String id, String name, double price) {
-        logger.info("Adding product with id " + id + " and name " + name);
-        maletaList.add(new Maleta(id, name, price));
+    public AvionesManagerImpl() {
+        aviones = new HashMap<>();
+        vuelos = new HashMap<>();
 
     }
 
     @Override
-    public List<Maleta> getProductsByPrice() {
-        logger.info("Getting products by price");
-        maletaList.sort(Comparator.comparing(Maleta::getPreu).reversed());
-        return maletaList;
+    public void addAvion(String id, String name, String Compania) {
+        logger.info("Adding Avion with id " + id + " and name " + name);
+        aviones.put(id,new Avion(id,name,Compania));
     }
-
     @Override
-    public void addOrder(Avion avion) {
-        avionQueue.add(avion);
-        users.put(avion.getUser(), avion.getUser1());
+    public int numVols() {
+        return vuelos.size();
     }
-
     @Override
-    public int numOrders() {
-        return avionQueue.size();
-    }
-
-    @Override
-    public Avion deliverOrder() {
-        Avion avion = avionQueue.poll();
-        return avion;
-    }
-
-    public Avion deliverOrder1(String name) {
-        for (Avion avion : avionQueue) {
-            if (avion.getUser().equals(name)) {
-                return avion; // Devuelve la orden si el usuario coincide
-            }
+    public void addVuelo(String id, String avion, String origen, String destino, String horaSalida, String horaLlegada){
+        logger.info("Adding Vuelo");
+        if (!aviones.containsKey(avion)) {
+            logger.error("No existe el avión con id " + avion);
+            throw new AvionNotFoundException("El avion no existe");
         }
-        return null; // Si no encuentra ninguna orden con ese usuario
+        Vuelo vuelo = new Vuelo(id, aviones.get(avion), origen, destino, horaSalida, horaLlegada);
+        vuelos.put(id, vuelo);
+        logger.info("Vuelo " + id + " agregado/modificado correctamente");
+    }
+    @Override
+    public Avion getAvion(String id){
+        return aviones.get(id);
     }
 
     @Override
-    public Maleta getProduct(String c1) {
-        for (Maleta p : this.maletaList) {
-            if (p.getId().equals(c1)) {
-                return p;
-            }
+    public Vuelo getVuelo(String id){
+        return vuelos.get(id);
+    }
+
+    @Override
+    public Maleta facturarMaleta(String usuario, String vueloId) {
+        if (!vuelos.containsKey(vueloId)) {
+            logger.error("Vuelo " + vueloId + " no existe");
+            throw new VueloNotFoundException("El vuelo no existe");
         }
-        return null;
+        Vuelo v = vuelos.get(vueloId);
+        Maleta maleta = new Maleta(vueloId, usuario);
+        v.getMaletas().add(maleta);
+        logger.info("Maleta facturada para el usuario " + usuario + " en el vuelo " + vueloId);
+        return maleta;
     }
 
     @Override
-    public User getUser(String number) {
-        return users.get(number);
-    }
-    @Override
-    public int numUsers() {
-        return users.size();
-    }
-
-    @Override
-    public void deleteProduct(String id) {
-        for (Maleta p : this.maletaList) {
-            if (p.getId().equals(id)) {
-                maletaList.remove(p);
-            }
+    public Queue<Maleta> getMaletasVuelo(String vueloId) {
+        if (!vuelos.containsKey(vueloId)) {
+            logger.error("Vuelo " + vueloId + " no existe");
+            throw new VueloNotFoundException("El vuelo no existe");
         }
-
+        Vuelo v = vuelos.get(vueloId);
+        return v.getMaletas();
     }
 
-
-    @Override
-    public List<Maleta> findAll() {
-        return maletaList;
-    }
-
-    @Override
-    public Maleta updateProduct(Maleta maleta) {
-        for (Maleta p : this.maletaList) {
-            if (p.getId().equals(maleta.getId())) {
-                return maleta;
-            }
-        }
-        return null;
-    }
-
-    public List<Maleta> getProductList() {
-        return maletaList;
-    }
-
-    @Override
-    public void addUser(User user) {
-        users.put(user.getNom(),user);
-    }
 }

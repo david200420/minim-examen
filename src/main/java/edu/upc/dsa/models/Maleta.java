@@ -1,47 +1,29 @@
 package edu.upc.dsa.models;
-import edu.upc.dsa.util.RandomUtils;
 
-public class Product {
+public class Maleta {
 
-    private double preu;
-    private String nom;
+    private String usuari;
     private String id;
-    private int cantitat;
 
-    public Product() {
+
+    public Maleta() {
     }
 
-    public Product(int cantitat, String name) {
-        this.cantitat= cantitat;
-        this.nom = name;//y si lo son pues le pone un valor, asi ahorramos constructores.
-    }
-
-    public Product(String id, String name, double price  ) {
+    public Maleta(String id, String name) {
         this.id= id;
-        this.preu = price;
-        this.nom = name;//y si lo son pues le pone un valor, asi ahorramos constructores.
+        this.usuari = name;
     }
 
-    public String getNom() {
-        return this.nom;
+    public void setUsuari(String usuari) {
+        this.usuari = usuari;
     }
 
-    public String getId () {
+    public String getUsuari() {
+        return usuari;
+    }
+
+    public String getId() {
         return this.id;
-    }
-    public double getPreu() {
-        return preu;
-    }
-    public double sales() {
-        return this.preu;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public void setCantitat(int cantitat) {
-        this.cantitat = cantitat;
     }
 
     public void setId(String id) {
@@ -49,7 +31,5 @@ public class Product {
     }
 
 
-    public void setPreu(double preu) {
-        this.preu = preu;
-    }
+
 }

@@ -1,152 +1,98 @@
 package edu.upc.dsa.services;
 
-import edu.upc.dsa.ProductManager;
-import edu.upc.dsa.ProductManagerImpl;
-
-
-import edu.upc.dsa.models.Order;
-import edu.upc.dsa.models.User;
+import edu.upc.dsa.AvionesManager;
+import edu.upc.dsa.AvionesManagerImpl;
+import edu.upc.dsa.models.Avion;
+import edu.upc.dsa.models.Vuelo;
+import edu.upc.dsa.models.Maleta;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Queue;
 
-@Api(value = "/products", description = "Endpoint to Product Service")
-@Path("/tracks")
+@Api(value = "/products", description = "Endpoint to Maleta Service")
+@Path("/products")
 public class ProductService {
 
-    private ProductManager pm;
+    private AvionesManager pm;
 
     public ProductService() {
-        this.pm = ProductManagerImpl.getInstance();
-        if (pm.numOrders()==0) {
-            pm = new ProductManagerImpl();
-            pm.addProduct("C1", "Coca-cola zero", 2);
-            pm.addProduct("C2", "Coca-cola", 2.5);
-            pm.addProduct("B1", "Lomo queso", 3);
-            pm.addProduct("B2", "bacon queso", 3.5);
+        this.pm = AvionesManagerImpl.getInstance();
+
+        pm.addAvion("A1", "Boeing 737", "Iberia");
+        pm.addAvion("A2", "Airbus A320", "Vueling");
+        pm.addVuelo("V1", "A1", "Madrid", "Paris", "8:00", "10:00");
+        pm.addVuelo("V2", "A2", "Paris", "Madrid", "10:00", "13:00");
+        pm.facturarMaleta("Maria", "V1");
+        pm.facturarMaleta("Juana", "V2");
+        pm.facturarMaleta("Ruben", "V1");
+    }
+
+//    @GET
+//    @ApiOperation(value = "Veure maletes en un Vol específic", notes = "Hola")
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 201, message = "Successful", response = Maleta.class, responseContainer = "List")
+//    })
+//    @Path("/")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response maletesVol(String id) {
+//        if(id == null) {
+//            return Response.status(500).build();
+//        }
+//        Queue<Maleta> maletas = this.pm.getMaletasVuelo(id);
+//        GenericEntity<Queue<Maleta>> entity = new GenericEntity<Queue<Maleta>>(maletas) {};
+//        return Response.status(201).entity(entity).build();
+//    }
+
+    @POST
+    @ApiOperation(value = "create a new Maleta", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = Maleta.class),
+            @ApiResponse(code = 500, message = "Validation Error")
+    })
+    @Path("/maleta")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response newProduct(String usuario, String idvuelo) {
+        if (usuario == null || idvuelo == null)
+            return Response.status(500).build();
+        Maleta m = this.pm.facturarMaleta(usuario, idvuelo);
+        return Response.status(201).entity(m).build();
+    }
+
+    @POST
+    @ApiOperation(value = "create a new Vol", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = Avion.class),
+            @ApiResponse(code = 500, message = "Validation Error")
+    })
+    @Path("/avion")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response newVol(Vuelo v) {
+        if (v.getId() == null)
+            return Response.status(500).entity(v).build();
+        this.pm.addVuelo(v.getId(),v.getAvion().getId(),v.getOrigen(),v.getDestino(),v.getHoraSalida(),v.getHoraLlegada());
+        return Response.status(201).entity(v).build();
+    }
+
+    @POST
+    @ApiOperation(value = "afegir avio", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = Avion.class),
+            @ApiResponse(code = 500, message = "Validation Error")
+    })
+    @Path("/user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response newAvion(Avion a) {
+        if (a.getId() == null) {
+            return Response.status(500).entity(a).build();
         }
-
-
+        this.pm.addAvion(a.getId(), a.getModel(),a.getCompañia());
+        return Response.status(201).entity(a).build();
     }
-
-    @GET
-    @ApiOperation(value = "get all Product", notes = "Hola")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = models.Product.class, responseContainer="List"),
-    })
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTracks() {
-
-        List<models.Product> products = this.pm.findAll();
-
-        GenericEntity<List<models.Product>> entity = new GenericEntity<List<models.Product>>(products) {};
-        return Response.status(201).entity(entity).build()  ;
-
-    }
-
-    @GET
-    @ApiOperation(value = "get a Product", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = models.Product.class),
-            @ApiResponse(code = 404, message = "Product not found")
-    })
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTrack(@PathParam("id") String id) {
-        models.Product t = this.pm.getProduct(id);
-        if (t == null) return Response.status(404).build();
-        else  return Response.status(201).entity(t).build();
-    }
-
-    @DELETE
-    @ApiOperation(value = "delete a Product", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful"),
-            @ApiResponse(code = 404, message = "Product not found")
-    })
-    @Path("/{id}")
-    public Response deleteProduct(@PathParam("id") String id) {
-        models.Product t = this.pm.getProduct(id);
-        if (t == null) return Response.status(404).build();
-        else this.pm.deleteProduct(id);
-        return Response.status(201).build();
-    }
-
-    @PUT
-    @ApiOperation(value = "update a Product", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful"),
-            @ApiResponse(code = 404, message = "Product not found")
-    })
-    @Path("/")
-    public Response updateProduct(models.Product product) {
-
-        models.Product t = this.pm.updateProduct(product);
-
-        if (t == null) return Response.status(404).build();
-
-        return Response.status(201).build();
-    }
-
-
-
-    @POST
-    @ApiOperation(value = "create a new Product", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response= models.Product.class),
-            @ApiResponse(code = 500, message = "Validation Error")
-
-    })
-
-    @Path("/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response newProduct(models.Product product) {
-
-        if (product.getNom()==null || product.getId()==null)  return Response.status(500).entity(product).build();
-        this.pm.addProduct(product.getNom(), product.getId(), product.getPreu());
-        return Response.status(201).entity(product).build();
-    }
-
-    @POST
-    @ApiOperation(value = "create a new Order", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response= Order.class),
-            @ApiResponse(code = 500, message = "Validation Error")
-
-    })
-
-    @Path("/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response newOrder(Order Order) {
-
-        if (Order.getUser1()==null)  return Response.status(500).entity(Order).build();
-        this.pm.addOrder(Order);
-        return Response.status(201).entity(Order).build();
-    }
-
-   @POST
-   @ApiOperation(value = "create a new Product", notes = "asdasd")
-   @ApiResponses(value = {
-           @ApiResponse(code = 201, message = "Successful", response= User.class),
-            @ApiResponse(code = 500, message = "Validation Error")
-
-    })
-
-    @Path("/")//aun no
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response newUser(User User) {
-
-        if (User.getNom()==null)  return Response.status(500).entity(User).build();
-        this.pm.addUser(User);
-       return Response.status(201).entity(User).build();
-   }
-
 }

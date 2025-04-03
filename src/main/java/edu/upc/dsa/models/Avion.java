@@ -3,52 +3,43 @@ package edu.upc.dsa.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Avion {
 
-    private int id;
-    private User user;
-    private List <Maleta> pedido;
+    private String id;
+    private String modelo;
+    private String compania;
 
-    public Order(String dni) {
-        this.user = new User(0,dni); // pasa de string a int
-        this.pedido = new ArrayList<>(); //Importante inicializar la lista pq si no se tendra que crear en el test y no lo hace
-    }
-    public Order(int id, User user, List <Maleta> pedido) {
+
+    public Avion(String id, String modelo, String compania) {
         this.id = id;
-        this.user = user;
-        this.pedido = pedido;
+        this.modelo = modelo;
+        this.compania = compania;
     }
-    public int getId() {
+    public Avion() {
+    }
+
+    public String getId() {
+
         return id;
     }
 
-    public void addLP(int i, String s) {
-        Maleta p = new Maleta(i,s);
-        this.pedido.add(p);
-    }
-
-    public void setPedido(List<Maleta> pedido) {
-        this.pedido = pedido;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public List <Maleta> getPedidos() {
-        return pedido;
+    public String getModel() {
+        return this.modelo;
     }
-    public String getLP(int i){
-        return pedido.get(i).getNom();
+
+    public void setId(int id) {
+        this.id = String.valueOf(id);
     }
-    public String getUser() {
-        return user.getNom();
+
+    public String getCompañia() {
+        return this.compania;
     }
-    public User getUser1() {
-        return this.user;
-    }
+
+
+
 }
+
