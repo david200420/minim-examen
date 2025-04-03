@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.util.List;
 
 
-import models.Product;
+import edu.upc.dsa.models.Product;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -41,7 +41,7 @@ public class ProductManagerTest {
 
     @Test
     public void testProductByPrice() {
-        List<models.Product> products = pm.getProductsByPrice();
+        List<Product> products = pm.getProductsByPrice();
         Assert.assertEquals(3.5, products.get(0).getPreu(),0);
         Assert.assertEquals(3, products.get(1).getPreu(), 0);
         Assert.assertEquals(2.5, products.get(2).getPreu(), 0);
@@ -72,7 +72,7 @@ public class ProductManagerTest {
     @Test
     public void testSales() {
         testDeliverOrder();
-        models.Product p = pm.getProduct("C1");
+        Product p = pm.getProduct("C1");
         Assert.assertEquals(2, (int)p.sales());
     }
 
