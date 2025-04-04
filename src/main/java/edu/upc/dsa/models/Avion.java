@@ -1,8 +1,5 @@
 package edu.upc.dsa.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Avion {
 
     private String id;
@@ -27,15 +24,21 @@ public class Avion {
         this.id = id;
     }
 
-    public String getModel() {
-        return this.modelo;
+
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
     }
 
-    public void setId(int id) {
-        this.id = String.valueOf(id);
+    public void setCompania(String compania) {
+        this.compania = compania;
     }
 
-    public String getCompañia() {
+    public String getModelo() {
+        return modelo;
+    }
+
+
+    public String getCompania() {
         return this.compania;
     }
 

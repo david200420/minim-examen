@@ -38,8 +38,8 @@ public class MaletaManagerTest {
         pm.addAvion("A1", "Boeing 747", "Lufthansa");
         Avion avion = pm.getAvion("A1");
         Assert.assertNotNull(avion);
-        Assert.assertEquals("Boeing 747", avion.getModel());
-        Assert.assertEquals("Lufthansa", avion.getCompañia());
+        Assert.assertEquals("Boeing 747", avion.getModelo());
+        Assert.assertEquals("Lufthansa", avion.getCompania());
     }
 
     @Test
@@ -47,8 +47,8 @@ public class MaletaManagerTest {
         pm.addAvion("A1", "Boeing 747", "Lufthansa");
         pm.addAvion("A1", "Boeing 777", "Iberia");
         Avion avion = pm.getAvion("A1");
-        Assert.assertEquals("Boeing 777", avion.getModel());
-        Assert.assertEquals("Iberia", avion.getCompañia());
+        Assert.assertEquals("Boeing 777", avion.getModelo());
+        Assert.assertEquals("Iberia", avion.getCompania());
     }
 
     @Test
@@ -98,7 +98,6 @@ public class MaletaManagerTest {
     @Test
     public void testFacturarMaletaVueloNoExiste() {
         try {
-            // Se intenta facturar una maleta para un vuelo inexistente "V99"
             pm.facturarMaleta("U2", "V99");
             Assert.fail("Debería haber lanzado excepción: Vuelo no existe");
         } catch (VueloNotFoundException e) {
@@ -108,14 +107,12 @@ public class MaletaManagerTest {
 
     @Test
     public void testObtenerMaletasVuelo() {
-        // Facturamos dos maletas en el vuelo V1
+
         pm.facturarMaleta("U1", "V1");
         pm.facturarMaleta("U2", "V1");
 
         Queue<Maleta> maletas = pm.getMaletasVuelo("V1");
         Assert.assertEquals(2, maletas.size());
-
-        // Convertimos la Queue a un array para comprobar el orden
         Maleta[] arrayMaletas = maletas.toArray(new Maleta[0]);
         Assert.assertEquals("U1", arrayMaletas[0].getUsuari());
         Assert.assertEquals("U2", arrayMaletas[1].getUsuari());

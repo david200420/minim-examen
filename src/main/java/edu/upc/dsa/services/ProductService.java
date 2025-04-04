@@ -13,11 +13,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.Queue;
 
-@Api(value = "/products", description = "Endpoint to Maleta Service")
-@Path("/products")
+@Api(value = "/avion", description = "Endpoint to Maleta Service")
+@Path("/avion")
 public class ProductService {
 
     private AvionesManager pm;
@@ -34,21 +33,24 @@ public class ProductService {
         pm.facturarMaleta("Ruben", "V1");
     }
 
-//    @GET
-//    @ApiOperation(value = "Veure maletes en un Vol específic", notes = "Hola")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 201, message = "Successful", response = Maleta.class, responseContainer = "List")
-//    })
-//    @Path("/")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response maletesVol(String id) {
-//        if(id == null) {
-//            return Response.status(500).build();
-//        }
-//        Queue<Maleta> maletas = this.pm.getMaletasVuelo(id);
-//        GenericEntity<Queue<Maleta>> entity = new GenericEntity<Queue<Maleta>>(maletas) {};
-//        return Response.status(201).entity(entity).build();
-//    }
+    @GET
+    @ApiOperation(value = "Veure maletes en un Vol específic", notes = "Hola")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful", response = Maleta.class, responseContainer = "Queue")
+    })
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response maletesVol(@PathParam("id") String id) {
+        if(id == null || id.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Queue<Maleta> maletas = this.pm.getMaletasVuelo(id);
+        if(maletas == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        GenericEntity<Queue<Maleta>> entity = new GenericEntity<Queue<Maleta>>(maletas) {};
+        return Response.ok(entity).build();
+    }
 
     @POST
     @ApiOperation(value = "create a new Maleta", notes = "asdasd")
@@ -58,7 +60,7 @@ public class ProductService {
     })
     @Path("/maleta")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response newProduct(String usuario, String idvuelo) {
+    public Response newMaleta(@QueryParam("usuario") String usuario, @QueryParam("idvuelo") String idvuelo) {
         if (usuario == null || idvuelo == null)
             return Response.status(500).build();
         Maleta m = this.pm.facturarMaleta(usuario, idvuelo);
@@ -92,7 +94,7 @@ public class ProductService {
         if (a.getId() == null) {
             return Response.status(500).entity(a).build();
         }
-        this.pm.addAvion(a.getId(), a.getModel(),a.getCompañia());
+        this.pm.addAvion(a.getId(), a.getModelo(),a.getCompania());
         return Response.status(201).entity(a).build();
     }
 }

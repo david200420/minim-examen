@@ -13,6 +13,7 @@ import java.util.*;
 public class AvionesManagerImpl implements AvionesManager {
     private Map<String, Avion> aviones;
     private Map<String, Vuelo> vuelos;
+    int i =0;
 
     private static final Logger logger = LogManager.getLogger(AvionesManagerImpl.class);
     private static AvionesManagerImpl instance;
@@ -32,8 +33,9 @@ public class AvionesManagerImpl implements AvionesManager {
 
     @Override
     public void addAvion(String id, String name, String Compania) {
-        logger.info("Adding Avion with id " + id + " and name " + name);
+        logger.info("Adding Avion with id " + id + " and name " + name +  " and Compania " + Compania);
         aviones.put(id,new Avion(id,name,Compania));
+        logger.info("esto" + Compania);
     }
     @Override
     public int numVols() {
@@ -67,7 +69,8 @@ public class AvionesManagerImpl implements AvionesManager {
             throw new VueloNotFoundException("El vuelo no existe");
         }
         Vuelo v = vuelos.get(vueloId);
-        Maleta maleta = new Maleta(vueloId, usuario);
+        Maleta maleta = new Maleta(vueloId + "#" + i, usuario);
+        i++;
         v.getMaletas().add(maleta);
         logger.info("Maleta facturada para el usuario " + usuario + " en el vuelo " + vueloId);
         return maleta;
